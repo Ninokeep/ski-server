@@ -1,30 +1,29 @@
-import { CourseDto } from './../dto/course/course.dto';
+import { CourseDto } from './dto/course.dto';
 import { Injectable } from '@nestjs/common';
-import { CourseEntity } from '../entity/course/course.entity';
+import { CourseEntity } from './entity/course.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import CreateCourseDto from '../dto/course/create-course.dto';
+import CreateCourseDto from './dto/create-course.dto';
+import UpdateCourseDto from './dto/update-course.dto';
+
 @Injectable()
 export class CourseService {
-
-  constructor(@InjectRepository(CourseEntity) private courseRepository: Repository<CourseEntity>) { }
+  constructor(
+    @InjectRepository(CourseEntity)
+    private courseRepository: Repository<CourseEntity>,
+  ) { }
 
   async create(courseRequest: CreateCourseDto): Promise<CourseDto> {
-
     const existingCourse = await this.courseRepository.findOne({
       where: {
-        name: courseRequest.name
-      }
+        name: courseRequest.name,
+      },
     });
 
-    if (existingCourse) {
-      throw new Error(`Course with name '${courseRequest.name}' already exists.`);
-    }
-
-
-    await this.courseRepository.createQueryBuilder("course")
-      .where("course.name != :name", {
-        name: 'snow freeride beginner'
+    await this.courseRepository
+      .createQueryBuilder('course')
+      .where('course.name != :name', {
+        name: 'snow freeride beginner',
       })
       .insert()
       .into(CourseEntity)
@@ -34,11 +33,26 @@ export class CourseService {
     return courseRequest;
   }
 
-  findAll(): Promise<CourseDto[]> {
-    return this.courseRepository.find();
+  async findAll(): Promise<CourseDto[]> {
+    return await this.courseRepository.find();
   }
 
-  findOne(id: number): Promise<CourseDto> {
-    return this.courseRepository.findOneBy({ id });
+  async findOne(id: number): Promise<CourseDto> {
+    return await this.courseRepository.findOneBy({ id });
+  }
+
+  async update(
+    id: number,
+    updateCourseDto: UpdateCourseDto,
+  ): Promise<UpdateCourseDto[]> {
+    const courseUpdated = (
+      await this.courseRepository.update(id, updateCourseDto)
+    ).affected;
+
+    if (!courseUpdated) {
+      return [];
+    }
+
+    return [updateCourseDto];
   }
 }

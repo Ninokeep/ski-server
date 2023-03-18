@@ -1,11 +1,12 @@
-import { CourseDto } from './../dto/course/course.dto';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { CourseDto } from './dto/course.dto';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CourseService } from './course.service';
-import CreateCourseDto from '../dto/course/create-course.dto';
+import CreateCourseDto from './dto/create-course.dto';
+import UpdateCourseDto from './dto/update-course.dto';
 
 @Controller('courses')
 export class CourseController {
-  constructor(private courseService: CourseService) { }
+  constructor(private courseService: CourseService) {}
 
   @Get()
   findAll(): Promise<CourseDto[]> {
@@ -21,5 +22,11 @@ export class CourseController {
   findOne(@Param('id') id: number): Promise<CourseDto> {
     return this.courseService.findOne(id);
   }
-
+  @Put(':id')
+  update(
+    @Param('id') id: number,
+    @Body() course: UpdateCourseDto,
+  ): Promise<UpdateCourseDto[]> {
+    return this.courseService.update(id, course);
+  }
 }
