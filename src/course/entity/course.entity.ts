@@ -1,4 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { MonitorEntity } from './../../monitor/entity/monitor.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 import { CustomerEntity } from '../../customer/entity/customer.entity';
 
@@ -27,4 +28,7 @@ export class CourseEntity {
 
   @ManyToOne(() => CustomerEntity, (customer) => customer.course)
   customer: CustomerEntity;
+
+  @OneToMany(() => MonitorEntity, (monitor) => monitor.course)
+  monitor: MonitorEntity;
 }

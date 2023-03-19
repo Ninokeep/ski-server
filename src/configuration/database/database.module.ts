@@ -1,3 +1,4 @@
+import { MonitorEntity } from './../../monitor/entity/monitor.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -13,11 +14,11 @@ import { CourseEntity } from '../../course/entity/course.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'syd',
-      entities: [CustomerEntity, CourseEntity],
+      entities: [CustomerEntity, CourseEntity, MonitorEntity],
       synchronize: true,
     }),
   ],
 })
 export class DatabaseModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) { }
 }
