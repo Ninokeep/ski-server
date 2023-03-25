@@ -6,6 +6,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateMonitorDto } from '../dto/create-monitor.dto';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { GetMonitorDto } from '../dto/get-monitor.dto';
+import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
+
+const moduleMocker = new ModuleMocker(global);
 
 describe('MonitorService', () => {
   let service: MonitorService;
@@ -14,7 +18,8 @@ describe('MonitorService', () => {
   const mockMonitorRepository = {
     create: jest.fn().mockImplementation((dto) => dto),
     save: jest.fn(),
-    findOne: jest.fn().mockImplementation((element) => element.where.name)
+    findOne: jest.fn().mockImplementation((element) => element.where.name),
+    find: jest.fn().mockImplementation((data) => data)
   }
 
   beforeEach(async () => {
@@ -47,7 +52,7 @@ describe('MonitorService', () => {
         password: 'lol'
       };
       const result: CreateMonitorDto = await service.create(
-        createMonitorDto,
+        createMonitorDto
       );
 
       expect(result).toEqual(createMonitorDto);
@@ -71,6 +76,39 @@ describe('MonitorService', () => {
       expect(errors.length).toEqual(0)
 
     })
+
+    it('should GET monitor ', async () => {
+
+      const monitor = new GetMonitorDto();
+      monitor.age = 100;
+      monitor.email = "toto@gmail.com";
+      monitor.id = 1;
+      monitor.lastname = "toto";
+      monitor.name = "leot";
+      monitor.password = "test";
+
+      jest.spyOn(service, 'findOne').mockImplementation(() => Promise.resolve(monitor));
+
+      expect(await service.findOne(monitor.id)).toBe(monitor);
+
+    })
+
+    it('check fail for emailvalidation DTO monitor', async () => {
+      const monitor = {
+        name: 'toto',
+        email: 'loail.com',
+        lastname: 'jean',
+        age: 100,
+        password: 'tutut'
+      };
+      const importOfDto = plainToInstance(CreateMonitorDto, monitor);
+
+      const errors = await validate(importOfDto);
+
+      expect(errors.length).toEqual(1)
+
+    })
+
   });
 
 });
