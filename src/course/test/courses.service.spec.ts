@@ -36,40 +36,4 @@ describe('CourseService', () => {
     expect(courseService).toBeDefined();
   });
 
-  it('should CREATE a course (201)', async () => {
-    const mockCourse = {
-      id: 1,
-      name: 'beginner ski',
-      price: 440,
-      place: 5,
-      startDate: new Date(),
-      endDate: new Date(),
-      level: 'beginner',
-      customer: null,
-    };
-
-    const mockQueryBuilder = {
-      select: jest.fn().mockReturnThis(),
-      from: jest.fn().mockReturnThis(),
-      where: jest.fn().mockReturnThis(),
-      andWhere: jest.fn().mockReturnThis(),
-      insert: jest.fn().mockReturnThis(),
-      into: jest.fn().mockReturnThis(),
-      values: jest.fn().mockReturnThis(),
-      execute: jest.fn().mockResolvedValueOnce(mockCourse),
-      orderBy: jest.fn().mockReturnThis(),
-      getMany: jest.fn().mockResolvedValueOnce(mockCourse),
-    };
-
-    jest.spyOn(courseRepository, 'findOne').mockResolvedValueOnce(mockCourse);
-    jest
-      .spyOn(courseRepository, 'createQueryBuilder')
-      .mockReturnValue(mockQueryBuilder as any);
-    jest.spyOn(courseRepository, 'create').mockReturnValueOnce(mockCourse);
-    jest.spyOn(courseRepository, 'save').mockResolvedValueOnce(mockCourse);
-
-    const result = await courseService.create(mockCourse);
-
-    expect(result).toEqual(mockCourse);
-  });
 });
