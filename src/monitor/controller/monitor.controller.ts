@@ -1,42 +1,70 @@
 import { UpdateMonitorDto } from './../dto/update-monitor.dto copy';
 import { CreateMonitorDto } from './../dto/create-monitor.dto';
 import { FindOneParamDto } from '../../common/dto/find-one-param.dto';
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { GetMonitorDto } from '../dto/get-monitor.dto';
 import { MonitorService } from '../service/monitor.service';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @Controller('monitors')
 export class MonitorController {
     constructor(private monitorService: MonitorService) { }
 
     @Get(':id')
-    findOne(@Param() { id }: FindOneParamDto): Promise<GetMonitorDto> {
+    async findOne(@Param() { id }: FindOneParamDto): Promise<GetMonitorDto> {
 
         return this.monitorService.findOne(id);
     }
 
     @Post()
-    create(@Body() request: CreateMonitorDto): Promise<CreateMonitorDto> {
+    async create(@Body() request: CreateMonitorDto): Promise<CreateMonitorDto> {
 
         return this.monitorService.create(request);
     }
 
     @Get()
-    findAll(): Promise<GetMonitorDto[]> {
+    async findAll(): Promise<GetMonitorDto[]> {
 
         return this.monitorService.findAll();
     }
 
     @Delete(':id')
-    delete(@Param() { id }: FindOneParamDto): Promise<DeleteResult> {
+    async delete(@Param() { id }: FindOneParamDto): Promise<DeleteResult> {
 
-        return this.monitorService.delete(id);
+        try {
+            return this.monitorService.delete(id);
+        }
+        catch (error) {
+            throw new HttpException({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: 'Unable to access database'
+            },
+                HttpStatus.INTERNAL_SERVER_ERROR, {
+                cause: error
+            })
+        }
     }
 
     @Put(':id')
-    update(@Param() { id }: FindOneParamDto, @Body() body: UpdateMonitorDto): Promise<any> {
+    async update(@Param() { id }: FindOneParamDto, @Body() body: UpdateMonitorDto): Promise<UpdateResult> {
 
-        return this.monitorService.update(id, body);
+        try {
+            return this.monitorService.update(id, body).catch(error => {
+                throw new HttpException({
+                    status: HttpStatus.BAD_REQUEST,
+                    error: 'email already exists',
+                }, HttpStatus.BAD_REQUEST, {
+                    cause: error
+                });
+            })
+        } catch (error) {
+            throw new HttpException({
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                error: 'Unable to access database'
+            },
+                HttpStatus.INTERNAL_SERVER_ERROR, {
+                cause: error
+            })
+        }
     }
 }
