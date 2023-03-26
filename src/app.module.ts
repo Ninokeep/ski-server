@@ -4,10 +4,18 @@ import { AppService } from './app.service';
 import { CourseModule } from './course/course.module';
 import { DatabaseModule } from './configuration/database/database.module';
 import { MonitorModule } from './monitor/monitor.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CourseModule, DatabaseModule, MonitorModule],
+  imports: [
+    ConfigModule.forRoot(),
+    CourseModule,
+    DatabaseModule,
+    MonitorModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+
+}

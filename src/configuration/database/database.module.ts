@@ -22,3 +22,4 @@ import { CourseEntity } from '../../course/entity/course.entity';
 export class DatabaseModule {
   constructor(private dataSource: DataSource) { }
 }
+
